@@ -1,0 +1,25 @@
+{
+  "name": "@nelreina/redis-stream-consumer",
+  "version": "1.1.0",
+  "main": "src/index.js",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "dev": "nodemon --watch src src/example/consumer.js"
+  },
+  "author": "@nelreina",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nelreina/redis-stream-consumer.git"
+  },
+  "dependencies": {
+    "redis": "^4.0.6"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0",
+    "nodemon": "^2.0.16"
+  }
+}
