@@ -4,14 +4,17 @@ import OS from "os";
 export default async (client, key, group, options = {}, logger = console) => {
   const createGroup = async (key, group, startID) => {
     try {
-      const resp = await client.xGroupCreate(key, group, startID, {
+      await client.xGroupCreate(key, group, startID, {
         MKSTREAM: true,
       });
+      logger.info(`${group} created for key: ${key}!`);
+      const info = await client.xInfoGroups(key);
+      logger.info(JSON.stringify(info));
       return true;
     } catch (error) {
       if (error.message.includes("already exists")) {
         const info = await client.xInfoGroups(key);
-        logger.info(info);
+        logger.info(JSON.stringify(info));
         return true;
       } else {
         logger.error(error.message);
@@ -24,7 +27,7 @@ export default async (client, key, group, options = {}, logger = console) => {
     try {
       await client.xGroupCreateConsumer(key, group, consumer);
       const info = await client.xInfoConsumers(key, group);
-      logger.info(info);
+      logger.info(JSON.stringify(info));
       return true;
     } catch (error) {
       console.log(
