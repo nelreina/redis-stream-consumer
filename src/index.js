@@ -35,7 +35,7 @@ export default async (client, key, group, options = {}, logger = console) => {
     }
   };
   // Handle Defaults
-  const autoAck = options.autoAck || false;
+  const autoAck = options.autoAck || true;
   const startID = options.startID || "$";
   const consumer = options.consumer || OS.hostname();
 
