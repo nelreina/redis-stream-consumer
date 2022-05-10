@@ -6,13 +6,7 @@ A simple redis-streams consumer package with auto ack
 
 ```javascript
 import RedisStreamConsumer from "@nelreina/redis-stream-consumer";
-const stream = await RedisStreamConsumer(
-  redisClient,
-  KEY,
-  GROUP_NAME,
-  options,
-  logger
-);
+const stream = await RedisStreamConsumer(redisClient, KEY, GROUP_NAME, options);
 ```
 
 ## Example
@@ -33,7 +27,7 @@ const stream = await RedisStreamConsumer(
   "exampleGroup"
   // options = {
   //  consumer: os.hostname()
-  //  autoAck: true
+  //  autoAck: false
   //  startID: "$" begin at next entry / 0 from beginning
   // }
 );
@@ -50,13 +44,22 @@ if (stream.listen) {
 
 ## Options
 
-| Name     | Type    | Default       |
-| -------- | ------- | ------------- |
-| consumer | string  | os.hostname() |
-| autoAck  | boolean | true          |
-| startID  | string  | $             |
+| Name     | Type     | Default       |
+| -------- | -------- | ------------- |
+| consumer | string   | os.hostname() |
+| autoAck  | boolean  | false         |
+| startID  | string   | $             |
+| logger   | function | console       |
 
-# Run the example
+## Acknowledge Stream Message
+
+if autoAck is false / remember to acknowledge stream message
+
+```javascript
+  stream.ack(<stream_id>);
+```
+
+## Run the example
 
 - tested on node version v16.15.0
 - Redis client v4.x

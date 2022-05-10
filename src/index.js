@@ -1,7 +1,13 @@
 const BLOCK = 30000;
 import OS from "os";
 
-export default async (client, key, group, options = {}, logger = console) => {
+export default async (client, key, group, options = {}) => {
+  // Handle Defaults
+  const autoAck = options.autoAck || false;
+  const startID = options.startID || "$";
+  const consumer = options.consumer || OS.hostname();
+  const logger = options.logger || console;
+
   const createGroup = async (key, group, startID) => {
     try {
       await client.xGroupCreate(key, group, startID, {
@@ -37,10 +43,6 @@ export default async (client, key, group, options = {}, logger = console) => {
       return false;
     }
   };
-  // Handle Defaults
-  const autoAck = options.autoAck || true;
-  const startID = options.startID || "$";
-  const consumer = options.consumer || OS.hostname();
 
   const groupOK = await createGroup(key, group, startID);
   if (!groupOK) return {};
@@ -48,6 +50,10 @@ export default async (client, key, group, options = {}, logger = console) => {
   if (!consumerOK) return {};
   const streamClient = client.duplicate();
   await streamClient.connect();
+
+  const ack = async (id) => {
+    const resp = await streamClient.xAck(key, group, payload.id);
+  };
 
   // Start listen to stream
   const listen = async (streamHandler) => {
@@ -62,7 +68,7 @@ export default async (client, key, group, options = {}, logger = console) => {
       const [payload] = msg.messages;
       await streamHandler(payload);
       if (autoAck) {
-        const resp = await streamClient.xAck(key, group, payload.id);
+        ack(payload.id);
       }
 
       listen(streamHandler);
@@ -70,5 +76,5 @@ export default async (client, key, group, options = {}, logger = console) => {
       listen(streamHandler);
     }
   };
-  return { listen };
+  return { listen, ack };
 };
