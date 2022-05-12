@@ -32,7 +32,7 @@ const stream = await RedisStreamConsumer(
   // }
 );
 
-const callback = async (message) => {
+const callback = async (id, message, ack) => {
   console.log(message);
   // Here your code to process stream message
 };

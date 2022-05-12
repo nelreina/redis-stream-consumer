@@ -52,7 +52,7 @@ export default async (client, key, group, options = {}) => {
   await streamClient.connect();
 
   const ack = async (id) => {
-    const resp = await streamClient.xAck(key, group, payload.id);
+    return await streamClient.xAck(key, group, id);
   };
 
   // Start listen to stream
@@ -65,15 +65,16 @@ export default async (client, key, group, options = {}) => {
     );
     if (messages) {
       const msg = messages[0];
-      const [payload] = msg.messages;
-      await streamHandler(payload);
+      const [streamData] = msg.messages;
+      const { id, message } = streamData;
+      await streamHandler(id, message, ack);
       if (autoAck) {
-        ack(payload.id);
+        await ack(id);
       }
 
-      listen(streamHandler);
+      await listen(streamHandler);
     } else {
-      listen(streamHandler);
+      await listen(streamHandler);
     }
   };
   return { listen, ack };
