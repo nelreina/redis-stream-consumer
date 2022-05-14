@@ -83,7 +83,7 @@ const Stream = async (client, key, group, options = {}) => {
 
 export default Stream;
 
-const checkIfEventStreamData = (event, aggregateId) => {
+const checkIfEventStreamData = (event, aggregateId, timestamp) => {
   if (!event) return false;
   if (event && event.length === 0) return false;
   if (!aggregateId) return false;
