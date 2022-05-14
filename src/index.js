@@ -96,18 +96,18 @@ export const newEventStreamService = async (
   conn,
   streamKeyName,
   serviceName,
-  watchEvent,
-  callback,
+  watchEvent = false,
+  callback = console.log,
   startID = "0"
 ) => {
+  if (!conn) throw Error("Redis connection is required!");
+  if (!streamKeyName) throw Error("streamKeyName is required!");
+  if (!serviceName) throw Error("serviceName is required!");
+
+  let message = `"${serviceName}" / "${streamKeyName}" init pending...`;
   const stream = await Stream(conn, streamKeyName, serviceName, { startID });
 
   if (stream.listen) {
-    console.info(
-      `"${serviceName}" listening to stream "${streamKeyName}" for "${
-        watchEvent ? "event " + watchEvent : "all events"
-      }"`
-    );
     stream.listen(async (id, message, ack) => {
       const { event, aggregateId, timestamp } = message;
       if (!checkIfEventStreamData(event, aggregateId)) {
@@ -131,7 +131,11 @@ export const newEventStreamService = async (
         await ack(id);
       }
     });
+    message = `"${serviceName}" listening to stream "${streamKeyName}" for "${
+      watchEvent ? "event(s) " + watchEvent : "all events"
+    }"`;
   }
+  return message;
 };
 
 export const addToEventLog = async (

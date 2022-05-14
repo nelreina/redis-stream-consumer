@@ -5,10 +5,5 @@ const STREAM = process.env["STREAM"];
 
 import { newEventStreamService } from "../index.js";
 
-newEventStreamService(
-  client,
-  STREAM,
-  "TEST-SRV",
-  ["POLKA", "TEST-EVENT"],
-  console.log
-);
+const message = await newEventStreamService(client, STREAM, "TEST-SRV");
+console.log(message);
