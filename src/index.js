@@ -85,9 +85,11 @@ export default Stream;
 
 const checkIfEventStreamData = (event, aggregateId) => {
   if (!event) return false;
-  if (!aggregateId) return false;
   if (event && event.length === 0) return false;
+  if (!aggregateId) return false;
   if (aggregateId && aggregateId.length === 0) return false;
+  if (!timestamp) return false;
+  if (timestamp && timestamp.length === 0) return false;
 
   return true;
 };
@@ -110,10 +112,10 @@ export const newEventStreamService = async (
   if (stream.listen) {
     stream.listen(async (id, message, ack) => {
       const { event, aggregateId, timestamp } = message;
-      if (!checkIfEventStreamData(event, aggregateId)) {
+      if (!checkIfEventStreamData(event, aggregateId, timestamp)) {
         console.log(
           "WARNING: this message is not a valid event stream! ",
-          "Missing fields: event and aggregateId"
+          "Missing fields: event, aggregateId or timestamp"
         );
         return;
       }
@@ -148,13 +150,13 @@ export const addToEventLog = async (
     );
   }
 
-  if (!checkIfEventStreamData(event, aggregateId)) {
+  const timestamp = getTimeStamp();
+  if (!checkIfEventStreamData(event, aggregateId, timestamp)) {
     throw Error(
-      "ERROR: Not a valid Event Stream Data!,  'event' and 'aggregateId' are required!"
+      "ERROR: Not a valid Event Stream Data!,  'event', 'aggregateId' and 'timestamp' are required!"
     );
   }
   console.info(JSON.stringify({ log: "addToStream", event, aggregateId }));
-  const timestamp = getTimeStamp();
   const streamData = {
     event,
     aggregateId,
