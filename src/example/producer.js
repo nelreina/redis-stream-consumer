@@ -1,26 +1,27 @@
-import { client } from "./redis-client.js";
-import { v4 as uuidv4 } from "uuid";
-import "dotenv/config";
+require("dotenv").config();
+const { client } = require("./redis-client.js");
+const { v4: uuidv4 } = require("uuid");
+const { addToEventLog } = require("../index.js");
 
 const STREAM = process.env["STREAM"];
 console.log("LOG:  ~ file: producer.js ~ line 5 ~ STREAM", STREAM);
 
-import { addToEventLog } from "../index.js";
-
 const producer = client.duplicate();
 
-await producer.connect();
+(async () => {
+  await producer.connect();
 
-setInterval(async () => {
-  const event = {
-    streamKeyName: STREAM,
-    event: "DANSA",
-    aggregateId: uuidv4(),
-    // payload: { message: "New evnt" },
-  };
-  try {
-    await addToEventLog(producer, event);
-  } catch (error) {
-    console.error(error.message);
-  }
-}, 1000);
+  setInterval(async () => {
+    const event = {
+      streamKeyName: STREAM,
+      event: "DANSA",
+      aggregateId: uuidv4(),
+      // payload: { message: "New evnt" },
+    };
+    try {
+      await addToEventLog(producer, event);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }, 1000);
+})();

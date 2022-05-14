@@ -1,6 +1,10 @@
-import { createClient } from "redis";
+const { createClient } = require("redis");
 
 const url = process.env.REDIS_URL;
 
-export const client = createClient({ url });
-await client.connect();
+const client = createClient({ url });
+(async () => {
+  await client.connect();
+})();
+
+exports.client = client;

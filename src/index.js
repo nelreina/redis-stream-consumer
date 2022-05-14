@@ -1,6 +1,7 @@
+const OS = require("os");
+const { getTimeStamp } = require("./lib/date-utils.js");
+
 const BLOCK = 30000;
-import OS from "os";
-import { getTimeStamp } from "./lib/date-utils.js";
 
 const Stream = async (client, key, group, options = {}) => {
   // Handle Defaults
@@ -78,10 +79,8 @@ const Stream = async (client, key, group, options = {}) => {
       await listen(streamHandler);
     }
   };
-  return { listen, ack };
+  return { listen, ack, addToEventLog };
 };
-
-export default Stream;
 
 const checkIfEventStreamData = (event, aggregateId, timestamp) => {
   if (!event) return false;
@@ -94,7 +93,7 @@ const checkIfEventStreamData = (event, aggregateId, timestamp) => {
   return true;
 };
 
-export const newEventStreamService = async (
+const newEventStreamService = async (
   conn,
   streamKeyName,
   serviceName,
@@ -141,7 +140,7 @@ export const newEventStreamService = async (
   return message;
 };
 
-export const addToEventLog = async (
+const addToEventLog = async (
   conn,
   { streamKeyName, event, aggregateId, payload }
 ) => {
@@ -166,3 +165,7 @@ export const addToEventLog = async (
   };
   await conn.xAdd(streamKeyName, "*", streamData);
 };
+
+exports.addToEventLog = addToEventLog;
+exports.newEventStreamService = newEventStreamService;
+exports.Stream = Stream;

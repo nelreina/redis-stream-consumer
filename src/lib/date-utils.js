@@ -1,5 +1,5 @@
-import day from "dayjs";
+const day = require("dayjs");
 
-export const getDate = (format) => day().format(format);
-export const getTimeStamp = () => day().format("YYYY-MM-DDTHH:mm:ss.SSS");
-export const today = () => day().format("YYYY-MM-DD");
+exports.getDate = (format) => day().format(format);
+exports.getTimeStamp = () => day().format("YYYY-MM-DDTHH:mm:ss.SSS");
+exports.today = () => day().format("YYYY-MM-DD");

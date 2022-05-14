@@ -1,9 +1,10 @@
-import { client } from "./redis-client.js";
-import "dotenv/config";
+require("dotenv").config();
+const { client } = require("./redis-client.js");
+const { newEventStreamService } = require("../index.js");
 
 const STREAM = process.env["STREAM"];
 
-import { newEventStreamService } from "../index.js";
-
-const message = await newEventStreamService(client, STREAM, "TEST-SRV");
-console.log(message);
+(async () => {
+  const message = await newEventStreamService(client, STREAM, "TEST-SRV");
+  console.log(message);
+})();
