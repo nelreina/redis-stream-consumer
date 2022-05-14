@@ -115,7 +115,8 @@ export const newEventStreamService = async (
       if (!checkIfEventStreamData(event, aggregateId, timestamp)) {
         console.log(
           "WARNING: this message is not a valid event stream! ",
-          "Missing fields: event, aggregateId or timestamp"
+          "Missing fields: event, aggregateId or timestamp",
+          `ID: ${id}`
         );
         return;
       }
