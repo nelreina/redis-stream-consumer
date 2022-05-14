@@ -2,6 +2,8 @@
 
 A simple redis-streams consumer package with auto ack
 
+## FOR commonjs version use @nelreina/redis-stream-consumer-commonjs
+
 ## Usage
 
 ```javascript
