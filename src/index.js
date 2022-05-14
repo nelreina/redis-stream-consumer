@@ -1,7 +1,8 @@
 const BLOCK = 30000;
 import OS from "os";
+import { getTimeStamp } from "./lib/date-utils.js";
 
-export default async (client, key, group, options = {}) => {
+const Stream = async (client, key, group, options = {}) => {
   // Handle Defaults
   const autoAck = options.autoAck || false;
   const startID = options.startID || "$";
@@ -78,4 +79,83 @@ export default async (client, key, group, options = {}) => {
     }
   };
   return { listen, ack };
+};
+
+export default Stream;
+
+const checkIfEventStreamData = (event, aggregateId) => {
+  if (!event) return false;
+  if (!aggregateId) return false;
+  if (event && event.length === 0) return false;
+  if (aggregateId && aggregateId.length === 0) return false;
+
+  return true;
+};
+
+export const newEventStreamService = async (
+  conn,
+  streamKeyName,
+  serviceName,
+  watchEvent,
+  callback,
+  startID = "0"
+) => {
+  const stream = await Stream(conn, streamKeyName, serviceName, { startID });
+
+  if (stream.listen) {
+    console.info(
+      `"${serviceName}" listening to stream "${streamKeyName}" for "${
+        watchEvent ? "event " + watchEvent : "all events"
+      }"`
+    );
+    stream.listen(async (id, message, ack) => {
+      const { event, aggregateId, timestamp } = message;
+      if (!checkIfEventStreamData(event, aggregateId)) {
+        console.log(
+          "WARNING: this message is not a valid event stream! ",
+          "Missing fields: event and aggregateId"
+        );
+        return;
+      }
+      const payload = JSON.parse(message.payload || "{}");
+      if (!watchEvent || watchEvent.includes(event)) {
+        await callback({
+          streamId: id,
+          aggregateId,
+          timestamp,
+          payload,
+          ack,
+          event,
+        });
+      } else {
+        await ack(id);
+      }
+    });
+  }
+};
+
+export const addToEventLog = async (
+  conn,
+  { streamKeyName, event, aggregateId, payload }
+) => {
+  if (!streamKeyName || (streamKeyName && streamKeyName.length === 0)) {
+    throw Error(
+      "ERROR: Not a valid Event Stream Data!,  'streamKeyName' are required!"
+    );
+  }
+
+  if (!checkIfEventStreamData(event, aggregateId)) {
+    throw Error(
+      "ERROR: Not a valid Event Stream Data!,  'event' and 'aggregateId' are required!"
+    );
+  }
+  console.info(JSON.stringify({ log: "addToStream", event, aggregateId }));
+  const timestamp = getTimeStamp();
+  const streamData = {
+    event,
+    aggregateId,
+    timestamp,
+    payload: JSON.stringify(payload || {}),
+  };
+  await conn.xAdd(streamKeyName, "*", streamData);
 };
