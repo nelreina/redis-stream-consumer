@@ -120,7 +120,7 @@ export const newEventStreamService = async (
         );
         return;
       }
-      let lPayLoad;
+      let lPayLoad = payload;
       try {
         lPayload = JSON.parse(payload || "{}");
       } catch (error) {
