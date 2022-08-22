@@ -120,12 +120,19 @@ export const newEventStreamService = async (
         );
         return;
       }
+      let lPayLoad;
+      try {
+        lPayload = JSON.parse(payload || "{}");
+      } catch (error) {
+        // Payload is not JSON
+        lPayload = payload;
+      }
       if (!watchEvent || watchEvent.includes(event)) {
         await callback({
           streamId: id,
           aggregateId,
           timestamp,
-          payload: JSON.parse(payload || "{}"),
+          payload: lPayLoad,
           ack,
           event,
           rest,
