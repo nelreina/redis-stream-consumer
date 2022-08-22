@@ -110,7 +110,7 @@ const newEventStreamService = async (
 
   if (stream.listen) {
     stream.listen(async (id, message, ack) => {
-      const { event, aggregateId, timestamp } = message;
+      const { event, aggregateId, timestamp, payload, ...rest } = message;
       if (!checkIfEventStreamData(event, aggregateId, timestamp)) {
         console.log(
           "WARNING: this message is not a valid event stream! ",
@@ -119,15 +119,22 @@ const newEventStreamService = async (
         );
         return;
       }
-      const payload = JSON.parse(message.payload || "{}");
+      let lPayLoad = payload;
+      try {
+        lPayload = JSON.parse(payload || "{}");
+      } catch (error) {
+        // Payload is not JSON
+        // lPayload = payload;
+      }
       if (!watchEvent || watchEvent.includes(event)) {
         await callback({
           streamId: id,
           aggregateId,
           timestamp,
-          payload,
+          payload: lPayLoad,
           ack,
           event,
+          rest,
         });
       } else {
         await ack(id);
