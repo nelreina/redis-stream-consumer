@@ -122,10 +122,9 @@ export const newEventStreamService = async (
       }
       let lPayLoad = payload;
       try {
-        lPayload = JSON.parse(payload || "{}");
+        lPayLoad = JSON.parse(lPayLoad || "{}");
       } catch (error) {
         // Payload is not JSON
-        lPayload = payload;
       }
       if (!watchEvent || watchEvent.includes(event)) {
         await callback({
