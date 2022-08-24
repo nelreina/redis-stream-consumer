@@ -37,7 +37,7 @@ const Stream = async (client, key, group, options = {}) => {
       logger.info(JSON.stringify(info));
       return true;
     } catch (error) {
-      console.log(
+      logger.error(
         "LOG:  ~ file: redis-stream.js ~ line 9 ~ error",
         error.message
       );
@@ -100,20 +100,24 @@ export const newEventStreamService = async (
   serviceName,
   watchEvent = false,
   callback = console.log,
-  startID = "0"
+  startID = "0",
+  logger = console
 ) => {
   if (!conn) throw Error("Redis connection is required!");
   if (!streamKeyName) throw Error("streamKeyName is required!");
   if (!serviceName) throw Error("serviceName is required!");
 
   let message = `"${serviceName}" / "${streamKeyName}" init pending...`;
-  const stream = await Stream(conn, streamKeyName, serviceName, { startID });
+  const stream = await Stream(conn, streamKeyName, serviceName, {
+    startID,
+    logger,
+  });
 
   if (stream.listen) {
     stream.listen(async (id, message, ack) => {
       const { event, aggregateId, timestamp, payload, ...rest } = message;
       if (!checkIfEventStreamData(event, aggregateId, timestamp)) {
-        console.log(
+        logger.error(
           "WARNING: this message is not a valid event stream! ",
           "Missing fields: event, aggregateId or timestamp",
           `ID: ${id}`
