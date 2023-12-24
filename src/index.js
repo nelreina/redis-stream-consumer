@@ -153,7 +153,7 @@ export const newEventStreamService = async (
 
 export const addToEventLog = async (
   conn,
-  { streamKeyName, event, aggregateId, payload }
+  { streamKeyName, event, aggregateId, payload, serviceName = "" }
 ) => {
   if (!streamKeyName || (streamKeyName && streamKeyName.length === 0)) {
     throw Error(
@@ -173,6 +173,7 @@ export const addToEventLog = async (
     aggregateId,
     timestamp,
     payload: JSON.stringify(payload || {}),
+    serviceName,
   };
   await conn.xAdd(streamKeyName, "*", streamData);
 };
