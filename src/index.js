@@ -138,15 +138,14 @@ export const newEventStreamService = async (
           payload: lPayLoad,
           ack,
           event,
-          rest,
+          ...rest,
         });
       } else {
         await ack(id);
       }
     });
-    message = `"${serviceName}" listening to stream "${streamKeyName}" for "${
-      watchEvent ? "event(s) " + watchEvent : "all events"
-    }"`;
+    message = `"${serviceName}" listening to stream "${streamKeyName}" for "${watchEvent ? "event(s) " + watchEvent : "all events"
+      }"`;
   }
   return message;
 };
